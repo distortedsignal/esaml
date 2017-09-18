@@ -1,4 +1,4 @@
 ebin
 .eunit
-.beam
+*/*.beam
 deps
