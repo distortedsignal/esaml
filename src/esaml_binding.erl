@@ -55,6 +55,7 @@ decode_response(_, SAMLResponse) ->
 %% Returns the URI that should be the target of redirection.
 -spec encode_http_redirect(IDPTarget :: uri(), SignedXml :: xml(), RelayState :: binary()) -> uri().
 encode_http_redirect(IdpTarget, SignedXml, RelayState) ->
+    io:fwrite("Trying to redirect to ~s with RelayState ~s", [IdpTarget, RelayState]),
     Type = xml_payload_type(SignedXml),
 	Req = lists:flatten(xmerl:export([SignedXml], xmerl_xml)),
     Param = http_uri:encode(base64:encode_to_string(zlib:zip(Req))),
