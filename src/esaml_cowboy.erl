@@ -165,6 +165,7 @@ validate_assertion(SP, DuplicateFun, Req) ->
         {'EXIT', Reason} ->
             {error, {bad_decode, Reason}, Req2};
         Xml ->
+            io:fwrite("Got XML output: ~n~p", [Xml]),
             case SP:validate_assertion(Xml, DuplicateFun) of
                 {ok, A} -> {ok, A, RelayState, Req2};
                 {error, E} -> {error, E, Req2}

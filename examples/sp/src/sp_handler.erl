@@ -14,15 +14,16 @@
 
 init(_Transport, Req, _Args) ->
     % Load the certificate and private key for the SP
-    PrivKey = esaml_util:load_private_key("test.key"),
+    % PrivKey = esaml_util:load_private_key("test.key"),
     Cert = esaml_util:load_certificate("test.crt"),
     % We build all of our URLs (in metadata, and in requests) based on this
-    Base = "http://some.hostname.com/saml",
+    Base = "http://localhost:8080/saml",
     % Certificate fingerprints to accept from our IDP
-    FPs = ["6b:d1:24:4b:38:cf:6c:1f:4e:53:56:c5:c8:90:63:68:55:5e:27:28"],
+    FPs = ["6C:21:74:E7:EA:9F:07:15:4C:5F:8F:4D:26:00:FC:5F:A9:F3:23:E0:85:44:D8:42:74:D5:2D:E3:63:F5:D1:63",
+           "BC:52:94:15:1D:34:1F:E7:13:69:98:5F:C7:C0:D1:5F:D8:62:6E:46:59:F2:F7:78:FA:C5:09:BC:49:14:2D:32"],
 
     SP = esaml_sp:setup(#esaml_sp{
-        key = PrivKey,
+        % key = "PrivKey",
         certificate = Cert,
         trusted_fingerprints = FPs,
         consume_uri = Base ++ "/consume",
@@ -30,7 +31,7 @@ init(_Transport, Req, _Args) ->
         org = #esaml_org{
             name = "Foo Bar",
             displayname = "Foo Bar",
-            url = "http://some.hostname.com"
+            url = "localhost:8080/saml"
         },
         tech = #esaml_contact{
             name = "Foo Bar",
@@ -39,7 +40,8 @@ init(_Transport, Req, _Args) ->
     }),
     % Rather than copying the IDP's metadata into our code, we'll just fetch it
     % (this call will cache after the first time around, so it will be fast)
-    IdpMeta = esaml_util:load_metadata("https://some.idp.com/idp/saml2/idp/metadata.php"),
+    IdpMeta = esaml_util:load_metadata("https://dev-791960.oktapreview.com/app/exkc067ll78MQJ7ws0h7/sso/saml/metadata"),
+    % IdpMeta = esaml_util:load_metadata("https://app.onelogin.com/saml/metadata/705309"),
 
     {ok, Req, #state{sp = SP, idp = IdpMeta}}.
 
@@ -57,7 +59,14 @@ handle(<<"GET">>, <<"metadata">>, Req, S = #state{sp = SP}) ->
 % and send it to our IDP
 handle(<<"GET">>, <<"auth">>, Req, S = #state{sp = SP,
         idp = #esaml_idp_metadata{login_location = IDP}}) ->
-    {ok, Req2} = esaml_cowboy:reply_with_authnreq(SP, IDP, <<"foo">>, Req),
+    SignedXml = SP:generate_authn_request(IDP),
+    Target = esaml_binding:encode_http_redirect(IDP, SignedXml, <<"">>),
+    % io:fwrite("\nUsed IDP: ~s\nTarget ~s.", [IDP, Target]),
+    {ok, Req2} = cowboy_req:reply(302, [
+            {<<"Cache-Control">>, <<"no-cache">>},
+            {<<"Pragma">>, <<"no-cache">>},
+            {<<"Location">>, Target}
+        ], <<"Redirecting...">>, Req),
     {ok, Req2, S};
 
 % Handles HTTP-POST bound assertions coming back from the IDP.
