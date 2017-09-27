@@ -166,13 +166,13 @@ verify(Element, Fingerprints) ->
     DsNs = [{"ds", 'http://www.w3.org/2000/09/xmldsig#'},
         {"ec", 'http://www.w3.org/2001/10/xml-exc-c14n#'}],
 
-    [#xmlAttribute{value = SignatureMethodAlgorithm}] = xmerl_xpath:string("ds:Signature/ds:SignedInfo/ds:SignatureMethod/@Algorithm", Element, [{namespace, DsNs}]),
+    [#xmlAttribute{value = SignatureMethodAlgorithm}] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo/ds:SignatureMethod/@Algorithm", Element, [{namespace, DsNs}]),
     {HashFunction, _, _} = signature_props(SignatureMethodAlgorithm),
 
-    [#xmlAttribute{value = "http://www.w3.org/2001/10/xml-exc-c14n#"}] = xmerl_xpath:string("ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm", Element, [{namespace, DsNs}]),
-    [#xmlAttribute{value = SignatureMethodAlgorithm}] = xmerl_xpath:string("ds:Signature/ds:SignedInfo/ds:SignatureMethod/@Algorithm", Element, [{namespace, DsNs}]),
-    [C14nTx = #xmlElement{}] = xmerl_xpath:string("ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform[@Algorithm='http://www.w3.org/2001/10/xml-exc-c14n#']", Element, [{namespace, DsNs}]),
-    InclNs = case xmerl_xpath:string("ec:InclusiveNamespaces/@PrefixList", C14nTx, [{namespace, DsNs}]) of
+    [#xmlAttribute{value = "http://www.w3.org/2001/10/xml-exc-c14n#"}] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod/@Algorithm", Element, [{namespace, DsNs}]),
+    [#xmlAttribute{value = SignatureMethodAlgorithm}] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo/ds:SignatureMethod/@Algorithm", Element, [{namespace, DsNs}]),
+    [C14nTx = #xmlElement{}] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms/ds:Transform[@Algorithm='http://www.w3.org/2001/10/xml-exc-c14n#']", Element, [{namespace, DsNs}]),
+    InclNs = case xmerl_xpath:string("//ec:InclusiveNamespaces/@PrefixList", C14nTx, [{namespace, DsNs}]) of
         [] -> [];
         [#xmlAttribute{value = NsList}] -> string:tokens(NsList, " ,")
     end,
@@ -181,21 +181,21 @@ verify(Element, Fingerprints) ->
     CanonXmlUtf8 = unicode:characters_to_binary(CanonXml, unicode, utf8),
     CanonSha = crypto:hash(HashFunction, CanonXmlUtf8),
 
-    [#xmlText{value = Sha64}] = xmerl_xpath:string("ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestValue/text()", Element, [{namespace, DsNs}]),
+    [#xmlText{value = Sha64}] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestValue/text()", Element, [{namespace, DsNs}]),
     CanonSha2 = base64:decode(Sha64),
 
     if not (CanonSha =:= CanonSha2) ->
         {error, bad_digest};
 
     true ->
-        [SigInfo] = xmerl_xpath:string("ds:Signature/ds:SignedInfo", Element, [{namespace, DsNs}]),
+        [SigInfo] = xmerl_xpath:string("//ds:Signature/ds:SignedInfo", Element, [{namespace, DsNs}]),
         SigInfoCanon = xmerl_c14n:c14n(SigInfo),
         Data = list_to_binary(SigInfoCanon),
 
-        [#xmlText{value = Sig64}] = xmerl_xpath:string("ds:Signature//ds:SignatureValue/text()", Element, [{namespace, DsNs}]),
+        [#xmlText{value = Sig64}] = xmerl_xpath:string("//ds:Signature//ds:SignatureValue/text()", Element, [{namespace, DsNs}]),
         Sig = base64:decode(Sig64),
 
-        [#xmlText{value = Cert64}] = xmerl_xpath:string("ds:Signature//ds:X509Certificate/text()", Element, [{namespace, DsNs}]),
+        [#xmlText{value = Cert64}] = xmerl_xpath:string("//ds:Signature//ds:X509Certificate/text()", Element, [{namespace, DsNs}]),
         CertBin = base64:decode(Cert64),
         CertHash = crypto:hash(sha, CertBin),
         CertHash2 = crypto:hash(sha256, CertBin),
