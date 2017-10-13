@@ -207,7 +207,7 @@ decode_logout_response(Xml) ->
     ], #esaml_logoutresp{}).
 
 %% @private
--spec decode_response(Xml :: #xmlElement{} | #xmlDocument) -> {ok, #esaml_response{}} | {error, term()}.
+-spec decode_response(Xml :: #xmlElement{} | #xmlDocument{}) -> {ok, #esaml_response{}} | {error, term()}.
 decode_response(Xml) ->
     Ns = [{"samlp", 'urn:oasis:names:tc:SAML:2.0:protocol'},
           {"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
