@@ -268,8 +268,8 @@ decode_assertion_conditions(Xml) ->
                     % Look here.
                     io:fwrite("Got value: ~s~n", [V]),
                     [{audience, V} | C];
-                _ ->
-                    io:fwrite("Didn't get value"),
+                Value ->
+                    io:fwrite("Didn't get value, instead got value (~p)", [Value]),
                     C
             end
         end
