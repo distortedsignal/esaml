@@ -1,5 +1,6 @@
 ebin
 .eunit
-.beam
+*beam
 deps
 .rebar/
+*DS_Store
