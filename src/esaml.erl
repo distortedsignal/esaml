@@ -260,7 +260,11 @@ decode_assertion_conditions(Xml) ->
         end,
         fun(C) ->
             case xmerl_xpath:string("/saml:Conditions/saml:AudienceRestriction/saml:Audience/text()", Xml, [{namespace, Ns}]) of
-                [#xmlText{value = V}] -> [{audience, V} | C]; _ -> C
+                [#xmlText{value = V}] ->
+                    % Look here.
+                    io:fwrite("Got value: ~s~n", [V]),
+                    [{audience, V} | C];
+                _ -> C
             end
         end
     ], []).
