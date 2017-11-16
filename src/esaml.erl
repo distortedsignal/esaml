@@ -225,6 +225,7 @@ decode_response(Xml) ->
 decode_assertion(Xml) ->
     Ns = [{"samlp", 'urn:oasis:names:tc:SAML:2.0:protocol'},
           {"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
+    io:fwrite("Threading until done."),
     esaml_util:threaduntil([
         ?xpath_attr_required("/saml:Assertion/@Version", esaml_assertion, version, bad_version),
         ?xpath_attr_required("/saml:Assertion/@IssueInstant", esaml_assertion, issue_instant, bad_assertion),
@@ -246,6 +247,7 @@ decode_assertion_subject(Xml) ->
 
 -spec decode_assertion_conditions(#xmlElement{}) -> {ok, conditions()} | {error, term()}.
 decode_assertion_conditions(Xml) ->
+    io:fwrite("Assembling conditions."),
     Ns = [{"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
     io:fwrite("Extracting conditions"),
     esaml_util:threaduntil([
