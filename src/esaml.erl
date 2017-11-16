@@ -225,7 +225,7 @@ decode_response(Xml) ->
 decode_assertion(Xml) ->
     Ns = [{"samlp", 'urn:oasis:names:tc:SAML:2.0:protocol'},
           {"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
-    io:fwrite("Threading until done."),
+    io:fwrite("Threading until done.~n"),
     esaml_util:threaduntil([
         ?xpath_attr_required("/saml:Assertion/@Version", esaml_assertion, version, bad_version),
         ?xpath_attr_required("/saml:Assertion/@IssueInstant", esaml_assertion, issue_instant, bad_assertion),
@@ -247,9 +247,8 @@ decode_assertion_subject(Xml) ->
 
 -spec decode_assertion_conditions(#xmlElement{}) -> {ok, conditions()} | {error, term()}.
 decode_assertion_conditions(Xml) ->
-    io:fwrite("Assembling conditions."),
     Ns = [{"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
-    io:fwrite("Extracting conditions"),
+    io:fwrite("Extracting conditions~n"),
     esaml_util:threaduntil([
         fun(C) ->
             case xmerl_xpath:string("/saml:Conditions/@NotBefore", Xml, [{namespace, Ns}]) of
@@ -269,7 +268,7 @@ decode_assertion_conditions(Xml) ->
                     io:fwrite("Got value: ~s~n", [V]),
                     [{audience, V} | C];
                 Value ->
-                    io:fwrite("Didn't get value, instead got value (~p)", [Value]),
+                    io:fwrite("Didn't get value, instead got value (~p)~n", [Value]),
                     C
             end
         end
