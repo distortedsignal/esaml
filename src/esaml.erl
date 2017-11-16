@@ -259,6 +259,7 @@ decode_assertion_conditions(Xml) ->
             end
         end,
         fun(C) ->
+            io:fwrite("Attempting to get audience restriction from XML."),
             case xmerl_xpath:string("/saml:Conditions/saml:AudienceRestriction/saml:Audience/text()", Xml, [{namespace, Ns}]) of
                 [#xmlText{value = V}] ->
                     % Look here.
