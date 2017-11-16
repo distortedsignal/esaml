@@ -247,6 +247,7 @@ decode_assertion_subject(Xml) ->
 -spec decode_assertion_conditions(#xmlElement{}) -> {ok, conditions()} | {error, term()}.
 decode_assertion_conditions(Xml) ->
     Ns = [{"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
+    io:fwrite("Extracting conditions"),
     esaml_util:threaduntil([
         fun(C) ->
             case xmerl_xpath:string("/saml:Conditions/@NotBefore", Xml, [{namespace, Ns}]) of
