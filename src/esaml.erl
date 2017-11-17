@@ -248,7 +248,6 @@ decode_assertion_subject(Xml) ->
 -spec decode_assertion_conditions(#xmlElement{}) -> {ok, conditions()} | {error, term()}.
 decode_assertion_conditions(Xml) ->
     Ns = [{"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
-    io:fwrite("Extracting conditions~n"),
     esaml_util:threaduntil([
         fun(C) ->
             case xmerl_xpath:string("/saml:Conditions/@NotBefore", Xml, [{namespace, Ns}]) of
@@ -261,11 +260,8 @@ decode_assertion_conditions(Xml) ->
             end
         end,
         fun(C) ->
-            io:fwrite("Attempting to get audience restriction from XML."),
             case xmerl_xpath:string("/saml:Conditions/saml:AudienceRestriction/saml:Audience/text()", Xml, [{namespace, Ns}]) of
                 [#xmlText{value = V}] ->
-                    % Look here.
-                    io:fwrite("Got value: ~s~n", [V]),
                     [{audience, V} | C];
                 Value when is_list(Value) ->
                     % If these are all xmlText, we're ok. If they're not, we need to send back C.
@@ -277,8 +273,7 @@ decode_assertion_conditions(Xml) ->
                     catch
                         _Throw -> C
                     end;
-                Value ->
-                    io:fwrite("Didn't get value, instead got value (~p)~n", [Value]),
+                _Value ->
                     C
             end
         end
