@@ -225,7 +225,6 @@ decode_response(Xml) ->
 decode_assertion(Xml) ->
     Ns = [{"samlp", 'urn:oasis:names:tc:SAML:2.0:protocol'},
           {"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
-    io:fwrite("Threading until done.~n"),
     esaml_util:threaduntil([
         ?xpath_attr_required("/saml:Assertion/@Version", esaml_assertion, version, bad_version),
         ?xpath_attr_required("/saml:Assertion/@IssueInstant", esaml_assertion, issue_instant, bad_assertion),
