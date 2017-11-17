@@ -267,6 +267,16 @@ decode_assertion_conditions(Xml) ->
                     % Look here.
                     io:fwrite("Got value: ~s~n", [V]),
                     [{audience, V} | C];
+                Value when is_list(Value) ->
+                    % If these are all xmlText, we're ok. If they're not, we need to send back C.
+                    FoldlFun = fun(#xmlText{value=Val}, AccIn) ->
+                        AccIn ++ Val
+                    end,
+                    try lists:foldl(FoldlFun, "", Value) of
+                        Audience -> [{audience, Audience} | C]
+                    catch
+                        _Throw -> C
+                    end;
                 Value ->
                     io:fwrite("Didn't get value, instead got value (~p)~n", [Value]),
                     C
