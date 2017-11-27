@@ -33,7 +33,10 @@ add_xml_id(Xml) ->
 %% @private
 -spec sanitize_to_ncname(string()) -> string().
 sanitize_to_ncname([FLetter | UuidString]) ->
-    [FLetter + 55 | UuidString].
+    case {FLetter >= 48, FLetter =<57} of
+        {true, true} -> [FLetter + 55 | UuidString];
+        _Other -> [FLetter | UuidString]
+    end.
 
 %% @doc Return an AuthnRequest as an XML element
 -spec generate_authn_request(IdpURL :: string(), esaml:sp()) -> #xmlElement{}.
