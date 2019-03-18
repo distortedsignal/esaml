@@ -9,6 +9,7 @@
                   kernel,
                   stdlib,
                   xmerl,
+                  cowboy,
                   ssl,
                   inets
                  ]},
