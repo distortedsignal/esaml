@@ -4,6 +4,7 @@
   {vsn, "1.1"},
   {registered, []},
   {included_applications, [
+  xmerl
   ]},
   {applications, [
                   kernel,
