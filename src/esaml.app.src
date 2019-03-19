@@ -3,9 +3,7 @@
   {description, "SAML for erlang"},
   {vsn, "1.1"},
   {registered, []},
-  {included_applications, [
-  xmerl
-  ]},
+  {included_applications, []},
   {applications, [
                   kernel,
                   stdlib,
@@ -14,7 +12,7 @@
                   ssl,
                   inets
                  ]},
-  {mod, { esaml, []}},
+  {mod, {esaml, []}},
   {env, [
     {org_name, "SAML Service Provider"},
     {org_displayname, "SAML Service Provider @ Some Location"},
