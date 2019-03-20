@@ -3,7 +3,7 @@
   {description, "SAML for erlang"},
   {vsn, "1.1"},
   {registered, []},
-  {included_applications, []},
+  {included_applications, [xmerl]},
   {applications, [
                   kernel,
                   stdlib,
