@@ -4,3 +4,5 @@ ebin
 deps
 .rebar/
 *DS_Store
+_build/
+rebar.lock
