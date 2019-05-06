@@ -26,9 +26,17 @@
 add_xml_id(Xml) ->
     Xml#xmlElement{attributes = Xml#xmlElement.attributes ++ [
         #xmlAttribute{name = 'ID',
-            value = uuid:to_string(uuid:uuid1()),
+            value = sanitize_to_ncname(uuid:to_string(uuid:uuid1())),
             namespace = #xmlNamespace{}}
         ]}.
+
+%% @private
+-spec sanitize_to_ncname(string()) -> string().
+sanitize_to_ncname([FLetter | UuidString]) ->
+    case {FLetter >= 48, FLetter =<57} of
+        {true, true} -> [FLetter + 55 | UuidString];
+        _Other -> [FLetter | UuidString]
+    end.
 
 %% @doc Return an AuthnRequest as an XML element
 -spec generate_authn_request(IdpURL :: string(), esaml:sp()) -> #xmlElement{}.

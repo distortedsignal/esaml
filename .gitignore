@@ -1,4 +1,8 @@
 ebin
 .eunit
-.beam
+*beam
 deps
+.rebar/
+*DS_Store
+_build/
+rebar.lock

@@ -12,7 +12,6 @@
 -behaviour(supervisor).
 
 -include_lib("xmerl/include/xmerl.hrl").
--include_lib("public_key/include/public_key.hrl").
 -include("esaml.hrl").
 
 -export([start/2, stop/1, init/1]).
@@ -207,7 +206,7 @@ decode_logout_response(Xml) ->
     ], #esaml_logoutresp{}).
 
 %% @private
--spec decode_response(Xml :: #xmlElement{}) -> {ok, #esaml_response{}} | {error, term()}.
+-spec decode_response(Xml :: #xmlElement{} | #xmlDocument{}) -> {ok, #esaml_response{}} | {error, term()}.
 decode_response(Xml) ->
     Ns = [{"samlp", 'urn:oasis:names:tc:SAML:2.0:protocol'},
           {"saml", 'urn:oasis:names:tc:SAML:2.0:assertion'}],
@@ -260,7 +259,20 @@ decode_assertion_conditions(Xml) ->
         end,
         fun(C) ->
             case xmerl_xpath:string("/saml:Conditions/saml:AudienceRestriction/saml:Audience/text()", Xml, [{namespace, Ns}]) of
-                [#xmlText{value = V}] -> [{audience, V} | C]; _ -> C
+                [#xmlText{value = V}] ->
+                    [{audience, V} | C];
+                Value when is_list(Value) ->
+                    % If these are all xmlText, we're ok. If they're not, we need to send back C.
+                    FoldlFun = fun(#xmlText{value=Val}, AccIn) ->
+                        AccIn ++ Val
+                    end,
+                    try lists:foldl(FoldlFun, "", Value) of
+                        Audience -> [{audience, Audience} | C]
+                    catch
+                        _Throw -> C
+                    end;
+                _Value ->
+                    C
             end
         end
     ], []).

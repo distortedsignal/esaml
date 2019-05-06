@@ -3,22 +3,20 @@
   {description, "SAML for erlang"},
   {vsn, "1.1"},
   {registered, []},
-  {included_applications, [
-  ]},
+  {included_applications, [xmerl]},
   {applications, [
                   kernel,
                   stdlib,
-                  xmerl,
-                  cowboy,
                   ssl,
                   inets
                  ]},
-  {mod, { esaml, []}},
+  {mod, {esaml, []}},
   {env, [
     {org_name, "SAML Service Provider"},
     {org_displayname, "SAML Service Provider @ Some Location"},
     {org_url, "http://sp.example.com"},
     {tech_contact, [{name, "SAML SP Support"}, {email, "saml-support@sp.example.com"}]},
     {trusted_fingerprints, []}
-    ]}
+    ]},
+  {runtime_dependencies, ["xmerl-1.3.7"]}
  ]}.

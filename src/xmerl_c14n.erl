@@ -18,7 +18,6 @@
 -export([c14n/3, c14n/2, c14n/1, xml_safe_string/2, xml_safe_string/1, canon_name/1]).
 
 -include_lib("xmerl/include/xmerl.hrl").
--include_lib("public_key/include/public_key.hrl").
 
 %% @doc Returns the canonical namespace-URI-prefix-resolved version of an XML name.
 %% @private
