@@ -12,7 +12,6 @@
 -behaviour(supervisor).
 
 -include_lib("xmerl/include/xmerl.hrl").
--include_lib("public_key/include/public_key.hrl").
 -include("esaml.hrl").
 
 -export([start/2, stop/1, init/1]).
