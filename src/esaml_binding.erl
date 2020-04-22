@@ -9,7 +9,7 @@
 %% @doc SAML HTTP binding handlers
 -module(esaml_binding).
 
--export([decode_response/2, encode_http_redirect/3, encode_http_post/3]).
+-export([decode_response/2, encode_http_redirect/3, encode_http_redirect/4, encode_http_post/3]).
 
 -include_lib("xmerl/include/xmerl.hrl").
 -define(deflate, <<"urn:oasis:names:tc:SAML:2.0:bindings:URL-Encoding:DEFLATE">>).
@@ -55,12 +55,22 @@ decode_response(_, SAMLResponse) ->
 %% Returns the URI that should be the target of redirection.
 -spec encode_http_redirect(IDPTarget :: uri(), SignedXml :: xml(), RelayState :: binary()) -> uri().
 encode_http_redirect(IdpTarget, SignedXml, RelayState) ->
+    encode_http_redirect(IdpTarget, SignedXml, RelayState, fun(A) -> A end).
+
+%% @doc Encode a SAMLRequest (or SAMLResponse) as an HTTP-REDIRECT binding
+%%
+%% Returns the URI that should be the target of redirection.
+-spec encode_http_redirect(IDPTarget :: uri(),
+                           SignedXml :: xml(),
+                           RelayState :: binary(),
+                           DeflateEncodeFun :: fun((binary()) -> binary())) -> uri().
+encode_http_redirect(IdpTarget, SignedXml, RelayState, DeflateEncodeFun) ->
     Type = xml_payload_type(SignedXml),
     Req = lists:flatten(xmerl:export([SignedXml], xmerl_xml)),
     Param = http_uri:encode(base64:encode_to_string(Req)),
     RelayStateEsc = http_uri:encode(binary_to_list(RelayState)),
     FirstParamDelimiter = case lists:member($?, IdpTarget) of true -> "&"; false -> "?" end,
-    iolist_to_binary([IdpTarget, FirstParamDelimiter, "SAMLEncoding=", ?deflate, "&", Type, "=", Param, "&RelayState=", RelayStateEsc]).
+    iolist_to_binary([IdpTarget, FirstParamDelimiter, "SAMLEncoding=", DeflateEncodeFun(?deflate), "&", Type, "=", Param, "&RelayState=", RelayStateEsc]).
 
 %% @doc Encode a SAMLRequest (or SAMLResponse) as an HTTP-POST binding
 %%
